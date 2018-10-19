@@ -1,7 +1,6 @@
 package mbarralo.hacks.authserver;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,10 +11,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
-import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
-import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
 @Configuration
@@ -31,7 +27,7 @@ public class Oauth2ServerConfiguration extends AuthorizationServerConfigurerAdap
     protected static class ResourceServer extends ResourceServerConfigurerAdapter {
 
         @Override
-        public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        public void configure(ResourceServerSecurityConfigurer resources) {
             resources.tokenStore(tokenStore).resourceId(SERVER_RESOURCE_ID);
         }
 
@@ -48,15 +44,18 @@ public class Oauth2ServerConfiguration extends AuthorizationServerConfigurerAdap
     @EnableAuthorizationServer
     protected static class AuthConfig extends AuthorizationServerConfigurerAdapter {
 
-        @Autowired
-        private AuthenticationManager authenticationManager;
+        private final AuthenticationManager authenticationManager;
+        private final PasswordEncoder passwordEncoder;
 
         @Autowired
-        private PasswordEncoder passwordEncoder;
+        public AuthConfig(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
+            this.authenticationManager = authenticationManager;
+            this.passwordEncoder = passwordEncoder;
+        }
 
 
         @Override
-        public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
             endpoints.authenticationManager(authenticationManager).tokenStore(tokenStore).approvalStoreDisabled();
         }
 

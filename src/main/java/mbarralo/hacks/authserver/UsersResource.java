@@ -11,8 +11,12 @@ import java.util.List;
 @RequestMapping("users")
 public class UsersResource {
 
+    private final UserRepository userRepository;
+
     @Autowired
-    UserRepository userRepository;
+    public UsersResource(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @GetMapping
     public List<User> getUsers() {

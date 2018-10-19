@@ -5,11 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Collections;
 
 import static java.util.Arrays.asList;
 
@@ -17,11 +16,14 @@ import static java.util.Arrays.asList;
 @SpringBootApplication
 public class AuthServerApplication {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    public AuthServerApplication(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     public static void main(String[] args) {
@@ -32,13 +34,13 @@ public class AuthServerApplication {
     @Bean
     InitializingBean sendDatabase() {
         return () -> {
-            userRepository.save(new User("user", passwordEncoder.encode("password"), asList("USER")));
+            userRepository.save(new User("user", passwordEncoder.encode("password"), Collections.singletonList("USER")));
             userRepository.save(new User("admin", passwordEncoder.encode("password"), asList("USER", "ADMIN")));
         };
     }
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    PasswordEncoder bcryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }

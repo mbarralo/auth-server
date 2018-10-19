@@ -15,8 +15,12 @@ public class ServerSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String USERS_BY_USERNAME_QUERY = "select username, password, enabled from user where username=? and enabled = true";
     private static final String AUTHORITIES_BY_USERNAME_QUERY = "select u.username, a.authority from user u left join authorities a on u.username = a.user where u.username=?";
 
+    private final DataSource dataSource;
+
     @Autowired
-    DataSource dataSource;
+    public ServerSecurityConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
 
     @Bean
